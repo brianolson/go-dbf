@@ -31,6 +31,9 @@ func getBestField(d *dbf.Dbf, names []string) *dbf.DbfField {
 }
 
 func main() {
+	totcount := 0
+	totrecords := 0
+	dbfsFound := 0
 	for _, fname := range os.Args[1:] {
 		zf, err := zip.OpenReader(fname)
 		if err != nil {
@@ -41,6 +44,7 @@ func main() {
 
 		for _, zff := range zf.File {
 			if strings.HasSuffix(zff.Name, ".dbf") {
+				dbfsFound++
 				log.Print(fname, " ", zff.Name)
 				ior, err := zff.Open()
 				if err != nil {
@@ -81,8 +85,11 @@ func main() {
 					}
 				}
 				log.Print("good ubid count=", okcount, " short=", shortcount, " num records=", d.NumRecords)
+				totcount += okcount
+				totrecords += int(d.NumRecords)
 				//state := getBestField(d, []string{"",""})
 			}
 		}
 	}
+	log.Printf("%d dbfs, %d total records, %d ok\n", dbfsFound, totrecords, totcount)
 }
